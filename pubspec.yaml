@@ -1,0 +1,20 @@
+name: inside_job
+description: Personal productivity and health tracker.
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.4.0
+  fl_chart: ^0.64.0
+  firebase_core: ^2.0.0
+  cloud_firestore: ^4.0.0
+  firebase_auth: ^4.0.0
+  firebase_messaging: ^14.0.0
+  uuid: ^4.4.0
+
+flutter:
+  uses-material-design: true

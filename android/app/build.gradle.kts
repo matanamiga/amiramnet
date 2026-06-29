@@ -35,4 +35,10 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     // On-device LAM loop (Phase 4): HTTP to local Ollama + the PC gate.
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // In-app QR pairing scanner: CameraX + ML Kit barcode scanning.
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
 }

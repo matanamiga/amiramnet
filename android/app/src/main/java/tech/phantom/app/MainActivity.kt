@@ -9,6 +9,7 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.OkHttpClient
 import tech.phantom.app.core.Agent
@@ -20,16 +21,18 @@ import java.util.concurrent.TimeUnit
 /**
  * Phantom — the phone brain's front-end.
  *
- * Two ways to run the same goal:
- *  • "Run via Termux"      — drives the `phantom` command in Termux (Phase 3).
- *  • "Run on-device"       — runs the Kotlin LAM loop in-process (Phase 4),
- *                            talking straight to local Ollama + the PC gate.
- * Settings (PC gate URL, model, Ollama URL) persist locally.
+ * Pair with the PC gate (scan its QR or paste its code), then run a goal either
+ * via the Termux `phantom` command (Phase 3) or with the in-app Kotlin LAM loop
+ * (Phase 4). Settings persist locally.
  */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var prefs: android.content.SharedPreferences
     private lateinit var logView: TextView
+    private lateinit var pairingCode: EditText
+    private lateinit var pcUrl: EditText
+    private lateinit var model: EditText
+    private lateinit var ollamaUrl: EditText
 
     private val http: OkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -38,18 +41,29 @@ class MainActivity : AppCompatActivity() {
             .build()
     }
 
+    private val scanLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
+            if (res.resultCode == RESULT_OK) {
+                res.data?.getStringExtra(ScanActivity.EXTRA_CODE)?.let { code ->
+                    pairingCode.setText(code)
+                    applyPairing(code)
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         prefs = getSharedPreferences("phantom", Context.MODE_PRIVATE)
 
-        val pairingCode = findViewById<EditText>(R.id.pairingCode)
-        val pairBtn = findViewById<Button>(R.id.pairButton)
-        val pcUrl = findViewById<EditText>(R.id.pcUrl)
-        val model = findViewById<EditText>(R.id.model)
-        val ollamaUrl = findViewById<EditText>(R.id.ollamaUrl)
+        pairingCode = findViewById(R.id.pairingCode)
+        pcUrl = findViewById(R.id.pcUrl)
+        model = findViewById(R.id.model)
+        ollamaUrl = findViewById(R.id.ollamaUrl)
         val goal = findViewById<EditText>(R.id.goal)
         logView = findViewById(R.id.log)
+        val scanBtn = findViewById<Button>(R.id.scanButton)
+        val pairBtn = findViewById<Button>(R.id.pairButton)
         val runTermuxBtn = findViewById<Button>(R.id.runButton)
         val runOnDeviceBtn = findViewById<Button>(R.id.runOnDeviceButton)
 
@@ -57,37 +71,11 @@ class MainActivity : AppCompatActivity() {
         model.setText(prefs.getString("model", "qwen2.5-vl:7b"))
         ollamaUrl.setText(prefs.getString("ollama_url", "http://127.0.0.1:11434"))
 
-        // Pairing: decode the gate's PHANTOM:… code into URL + token (+ model).
-        pairBtn.setOnClickListener {
-            try {
-                val p = Pairing.decode(pairingCode.text.toString())
-                pcUrl.setText(p.url)
-                if (p.model.isNotEmpty()) model.setText(p.model)
-                prefs.edit().putString("token", p.token).apply()
-                appendLog("✓ Paired with ${p.url}")
-            } catch (e: Exception) {
-                appendLog("Bad pairing code: ${e.message}")
-            }
-        }
-
-        fun readInputs(): Triple<String, String, String>? {
-            val url = pcUrl.text.toString().trim()
-            val mdl = model.text.toString().trim()
-            val g = goal.text.toString().trim()
-            if (url.isEmpty() || g.isEmpty()) {
-                appendLog("Enter the PC gate URL and a goal first.")
-                return null
-            }
-            prefs.edit()
-                .putString("pc_url", url)
-                .putString("model", mdl)
-                .putString("ollama_url", ollamaUrl.text.toString().trim())
-                .apply()
-            return Triple(url, mdl, g)
-        }
+        scanBtn.setOnClickListener { scanLauncher.launch(Intent(this, ScanActivity::class.java)) }
+        pairBtn.setOnClickListener { applyPairing(pairingCode.text.toString()) }
 
         runTermuxBtn.setOnClickListener {
-            val (url, mdl, g) = readInputs() ?: return@setOnClickListener
+            val (url, mdl, g) = readInputs(goal) ?: return@setOnClickListener
             appendLog("▶ Termux: $g")
             try {
                 TermuxRunner.run(this, url, mdl, token(), g, resultPendingIntent())
@@ -98,11 +86,40 @@ class MainActivity : AppCompatActivity() {
         }
 
         runOnDeviceBtn.setOnClickListener {
-            val (url, mdl, g) = readInputs() ?: return@setOnClickListener
+            val (url, mdl, g) = readInputs(goal) ?: return@setOnClickListener
             val ollama = ollamaUrl.text.toString().trim().ifEmpty { "http://127.0.0.1:11434" }
             appendLog("▶ On-device: $g")
             runOnDevice(url, ollama, mdl, g)
         }
+    }
+
+    /** Decode a PHANTOM: pairing code and fill URL + token (+ model). */
+    private fun applyPairing(code: String) {
+        try {
+            val p = Pairing.decode(code)
+            pcUrl.setText(p.url)
+            if (p.model.isNotEmpty()) model.setText(p.model)
+            prefs.edit().putString("token", p.token).apply()
+            appendLog("✓ Paired with ${p.url}")
+        } catch (e: Exception) {
+            appendLog("Bad pairing code: ${e.message}")
+        }
+    }
+
+    private fun readInputs(goal: EditText): Triple<String, String, String>? {
+        val url = pcUrl.text.toString().trim()
+        val mdl = model.text.toString().trim()
+        val g = goal.text.toString().trim()
+        if (url.isEmpty() || g.isEmpty()) {
+            appendLog("Enter the PC gate URL and a goal first.")
+            return null
+        }
+        prefs.edit()
+            .putString("pc_url", url)
+            .putString("model", mdl)
+            .putString("ollama_url", ollamaUrl.text.toString().trim())
+            .apply()
+        return Triple(url, mdl, g)
     }
 
     private fun token(): String = prefs.getString("token", "").orEmpty()

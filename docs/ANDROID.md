@@ -60,6 +60,11 @@ JSON and sliding-window memory. `core/PcClient.kt`, `core/OllamaClient.kt`,
 `core/Tools.kt`, and `core/Memory.kt` mirror their Python counterparts. Uses
 OkHttp; cleartext HTTP is enabled for LAN/localhost.
 
+"Run on-device" runs the loop inside `PhantomService`, a **foreground service**
+with an ongoing notification, so it survives the app being backgrounded. The
+**Stop** button (or the notification action) cancels it cooperatively between
+steps.
+
 ## Layout
 ```
 android/

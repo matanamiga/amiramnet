@@ -7,6 +7,10 @@
     <!-- Camera: scan the gate's pairing QR. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <!-- Foreground service: keep an on-device run alive when backgrounded. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Android 11+ package visibility: we need to see / talk to Termux. -->
     <queries>
@@ -34,6 +38,11 @@
             android:name=".ScanActivity"
             android:exported="false"
             android:label="@string/scan_qr" />
+
+        <service
+            android:name=".PhantomService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <!-- Receives stdout/stderr back from the Termux RUN_COMMAND service. -->
         <receiver

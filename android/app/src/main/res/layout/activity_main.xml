@@ -119,6 +119,12 @@
             android:layout_height="wrap_content"
             android:text="@string/run_on_device" />
 
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/stop" />
+
         <TextView
             android:id="@+id/log"
             android:layout_width="match_parent"

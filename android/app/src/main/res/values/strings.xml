@@ -17,4 +17,5 @@
     <string name="hint_goal">open the calculator and compute 12 * 9</string>
     <string name="run_termux">Run via Termux</string>
     <string name="run_on_device">Run on-device (no Termux)</string>
+    <string name="stop">Stop</string>
 </resources>

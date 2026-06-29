@@ -11,12 +11,8 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import okhttp3.OkHttpClient
-import tech.phantom.app.core.Agent
-import tech.phantom.app.core.OllamaClient
+import androidx.core.content.ContextCompat
 import tech.phantom.app.core.Pairing
-import tech.phantom.app.core.PcClient
-import java.util.concurrent.TimeUnit
 
 /**
  * Phantom — the phone brain's front-end.
@@ -33,13 +29,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pcUrl: EditText
     private lateinit var model: EditText
     private lateinit var ollamaUrl: EditText
-
-    private val http: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(180, TimeUnit.SECONDS)   // vision inference can be slow
-            .build()
-    }
 
     private val scanLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
@@ -66,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         val pairBtn = findViewById<Button>(R.id.pairButton)
         val runTermuxBtn = findViewById<Button>(R.id.runButton)
         val runOnDeviceBtn = findViewById<Button>(R.id.runOnDeviceButton)
+        val stopBtn = findViewById<Button>(R.id.stopButton)
 
         pcUrl.setText(prefs.getString("pc_url", "http://192.168.1.50:8765"))
         model.setText(prefs.getString("model", "qwen2.5-vl:7b"))
@@ -90,6 +80,11 @@ class MainActivity : AppCompatActivity() {
             val ollama = ollamaUrl.text.toString().trim().ifEmpty { "http://127.0.0.1:11434" }
             appendLog("▶ On-device: $g")
             runOnDevice(url, ollama, mdl, g)
+        }
+
+        stopBtn.setOnClickListener {
+            startService(Intent(this, PhantomService::class.java).setAction(PhantomService.ACTION_STOP))
+            appendLog("■ Stopping…")
         }
     }
 
@@ -124,16 +119,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun token(): String = prefs.getString("token", "").orEmpty()
 
-    /** Run the Kotlin LAM loop off the UI thread, streaming progress to the log. */
+    /** Run the LAM loop in a foreground service so it survives backgrounding. */
     private fun runOnDevice(pcUrl: String, ollamaUrl: String, model: String, goal: String) {
-        Thread {
-            val agent = Agent(
-                pc = PcClient(pcUrl, http, token()),
-                ollama = OllamaClient(ollamaUrl, model, numThreads = 4, client = http),
-            )
-            val summary = agent.run(goal) { line -> runOnUiThread { appendLog(line) } }
-            runOnUiThread { appendLog("— $summary —") }
-        }.start()
+        val intent = Intent(this, PhantomService::class.java)
+            .putExtra(PhantomService.EXTRA_PC_URL, pcUrl)
+            .putExtra(PhantomService.EXTRA_OLLAMA_URL, ollamaUrl)
+            .putExtra(PhantomService.EXTRA_MODEL, model)
+            .putExtra(PhantomService.EXTRA_TOKEN, token())
+            .putExtra(PhantomService.EXTRA_GOAL, goal)
+        ContextCompat.startForegroundService(this, intent)
     }
 
     /** PendingIntent the Termux service fills with stdout/stderr and broadcasts. */

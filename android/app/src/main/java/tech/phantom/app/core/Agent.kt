@@ -19,9 +19,16 @@ class Agent(
         "You are PHANTOM, a Large Action Model that operates a computer by sight.\n\n" +
             Tools.TOOLS_DESCRIPTION
 
-    /** Run the loop. [log] receives human-readable progress lines. */
-    fun run(goal: String, log: (String) -> Unit): String {
+    /**
+     * Run the loop. [isCancelled] is checked each step for cooperative stop;
+     * [log] receives human-readable progress lines.
+     */
+    fun run(goal: String, isCancelled: () -> Boolean = { false }, log: (String) -> Unit): String {
         for (step in 1..maxSteps) {
+            if (isCancelled()) {
+                log("■ stopped")
+                return "Stopped by user."
+            }
             try {
                 log("step $step · looking at the screen…")
                 val shot = pc.screenshot(scale)

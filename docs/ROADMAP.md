@@ -38,8 +38,8 @@ session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
 
 ## Possible future work (all 6 planned phases are done)
 - ✅ In-app camera QR scanning (CameraX + ML Kit) — `ScanActivity`.
+- ✅ Foreground service + Stop button for long on-device runs — `PhantomService`.
 - mDNS/zeroconf auto-discovery of the gate on the LAN.
-- A foreground service + Stop button for long on-device runs.
 - Real device E2E run + screenshots; signed release APK.
 
 ## Session log

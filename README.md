@@ -1,5 +1,7 @@
 # PHANTOM
 
+[![CI](https://github.com/matanamiga/amiramnet/actions/workflows/ci.yml/badge.svg)](https://github.com/matanamiga/amiramnet/actions/workflows/ci.yml)
+
 **A local DLAM — your phone is the brain, your PC is the hands.**
 
 PHANTOM turns a phone into a local **Large Action Model (LAM)** that operates
@@ -50,6 +52,11 @@ python -m phantom.phone "open the calculator and compute 12 * 9"
 ```bash
 python -m phantom.phone --demo
 ```
+
+### Android app (APK)
+Every push builds a debug APK in CI — download it from the latest green run's
+**Artifacts** (`phantom-debug-apk`), or build locally per
+[`docs/ANDROID.md`](docs/ANDROID.md).
 
 ## Project layout
 ```

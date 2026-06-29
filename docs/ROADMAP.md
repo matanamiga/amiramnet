@@ -39,6 +39,8 @@ session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
 ## Possible future work (all 6 planned phases are done)
 - ✅ In-app camera QR scanning (CameraX + ML Kit) — `ScanActivity`.
 - ✅ Foreground service + Stop button for long on-device runs — `PhantomService`.
+- ✅ CI builds the debug APK on every push (downloadable artifact) + runs
+  pytest — the Android app is verified to compile.
 - mDNS/zeroconf auto-discovery of the gate on the LAN.
 - Real device E2E run + screenshots; signed release APK.
 

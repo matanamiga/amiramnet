@@ -37,9 +37,20 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## Using it
 1. Start the gate on your PC (`Phantom-Gate.exe`) and note the URL.
-2. Open Phantom on the phone, enter the PC gate URL + model, type a goal, Run.
-3. The brain (Ollama in Termux) sees the PC screen and acts; output streams to
-   the app's log.
+2. Open Phantom on the phone, enter the PC gate URL + model, type a goal.
+3. Choose how to run:
+   - **Run via Termux** — drives the `phantom` command in Termux (Phase 3).
+   - **Run on-device** — runs the LAM loop *inside the app* (Phase 4), talking
+     straight to local Ollama (`http://127.0.0.1:11434`) and the gate. No
+     Termux command needed; Ollama must still be reachable on the phone.
+4. The brain sees the PC screen and acts; progress streams to the app's log.
+
+## On-device loop (Phase 4)
+`core/Agent.kt` is a Kotlin port of `phantom/phone/agent.py`: observe (gate
+screenshot) → decide (local Ollama vision) → act (gate), with the same tool
+JSON and sliding-window memory. `core/PcClient.kt`, `core/OllamaClient.kt`,
+`core/Tools.kt`, and `core/Memory.kt` mirror their Python counterparts. Uses
+OkHttp; cleartext HTTP is enabled for LAN/localhost.
 
 ## Layout
 ```

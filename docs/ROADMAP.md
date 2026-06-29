@@ -11,8 +11,8 @@ limits. The Python core is provider-local (Ollama) — zero API cost.
 | 1 | `Phantom-Gate.exe` packaging (PyInstaller) | ✅ done |
 | 2 | One-line Termux installer for the brain | ✅ done |
 | 3 | Native Android APK shell (Kotlin) driving the Termux brain | ✅ done |
-| 4 | Embedded on-device LLM in the APK + built-in camera/vision | ⬜ next |
-| 5 | Auto-pairing phone↔PC (QR / discovery) + polish | ⬜ |
+| 4 | LAM loop ported into the APK (Kotlin) — direct Ollama + gate | ✅ done |
+| 5 | Auto-pairing phone↔PC (QR / discovery) + polish | ⬜ next |
 
 ## Phase 3 kickoff brief (start here next session)
 
@@ -36,17 +36,17 @@ Recommended approach — thinnest viable native shell:
 Watch the Max limit: scaffold + UI + one happy-path run is plenty for one
 session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
 
-## Phase 4 kickoff brief (start here next session)
-Goal: make the APK self-contained — port the agent loop into Kotlin so it no
-longer needs the Termux `phantom` command.
-1. Mirror `phantom/common/protocol.py` models in Kotlin data classes.
-2. Port the loop (`phantom/phone/agent.py`): call local Ollama
-   `http://127.0.0.1:11434/api/generate` (vision, base64 image) and the PC gate
-   directly with OkHttp/Retrofit; reuse the same tool JSON + sliding window.
-3. Add a screen-capture / camera path for on-device vision if desired.
-Keep within the Max limit — porting the loop + one happy-path run is a session.
+## Phase 5 kickoff brief (start here next session)
+Goal: remove manual setup — phone and PC find each other and pair.
+1. PC gate: add mDNS/zeroconf advertisement (or a simple UDP broadcast
+   beacon) and print a QR encoding `{url, token}`.
+2. Android app: scan the QR (CameraX + ML Kit barcode) or auto-discover the
+   gate on the LAN; store the paired URL/token; send the token on every request.
+3. Gate: require the token (simple bearer check in `phantom/pc/worker.py`).
+4. Polish: foreground service for long runs, stop button, dark theme already on.
+Keep within the Max limit — pairing happy-path + token auth is one session.
 
 ## Session log
-- Session 1: phases 0–3. Rebranded amiranet → Phantom; Python core + EXE
-  packaging + Termux installer + native APK shell. Branch
-  `claude/code-subagents-project-id3k4o`.
+- Session 1: phases 0–4. Rebranded amiranet → Phantom; Python core + EXE
+  packaging + Termux installer + native APK shell + on-device Kotlin LAM loop.
+  Branch `claude/code-subagents-project-id3k4o`.

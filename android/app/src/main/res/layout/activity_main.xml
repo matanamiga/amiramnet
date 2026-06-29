@@ -54,6 +54,20 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/label_ollama"
+            android:paddingTop="12dp" />
+
+        <EditText
+            android:id="@+id/ollamaUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_ollama"
+            android:inputType="textUri"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/label_goal"
             android:paddingTop="12dp" />
 
@@ -70,8 +84,14 @@
             android:id="@+id/runButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/run"
+            android:text="@string/run_termux"
             android:paddingTop="8dp" />
+
+        <Button
+            android:id="@+id/runOnDeviceButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/run_on_device" />
 
         <TextView
             android:id="@+id/log"

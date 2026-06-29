@@ -71,7 +71,8 @@ Built in phases, each a separate session (so it never strains usage limits):
   (`installer/termux_install.sh`).
 - ✅ **Phase 3** — native Android APK shell (Kotlin) that drives the Termux
   brain. See [`docs/ANDROID.md`](docs/ANDROID.md).
-- ⬜ **Phase 4** — embedded on-device LLM in the APK + built-in camera/vision.
+- ✅ **Phase 4** — the LAM loop ported into the APK (Kotlin): talks straight to
+  local Ollama + the gate, no Termux needed. "Run on-device" button.
 - ⬜ **Phase 5** — auto-pairing phone↔PC (QR / network discovery) + polish.
 
 ## Tests

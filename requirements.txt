@@ -1,0 +1,16 @@
+# Shared
+pydantic>=2.5
+
+# Phone ("brain") — runs in Termux alongside Ollama
+requests>=2.31
+
+# PC ("body") — runs on the computer being driven
+fastapi>=0.110
+uvicorn>=0.27
+mss>=9.0
+pyautogui>=0.9.54
+pillow>=10.0
+
+# Dev / tests
+pytest>=8.0
+httpx>=0.27

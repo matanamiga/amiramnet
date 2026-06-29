@@ -1,4 +1,4 @@
-# AMIRANET — setup guide
+# PHANTOM — setup guide
 
 ## PC side (the GATE / body)
 
@@ -7,7 +7,7 @@ and executes actions.
 
 ```bash
 pip install -r requirements.txt
-python -m amiranet.pc
+python -m phantom.pc
 ```
 
 It prints the LAN URL to give the phone, e.g. `http://192.168.1.50:8765`.
@@ -16,12 +16,12 @@ Environment overrides:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `AMIRANET_PC_HOST` | `0.0.0.0` | bind address |
-| `AMIRANET_PC_PORT` | `8765` | port |
-| `AMIRANET_PC_ALLOW_COMMANDS` | `1` | allow `POST /command` shell execution |
+| `PHANTOM_PC_HOST` | `0.0.0.0` | bind address |
+| `PHANTOM_PC_PORT` | `8765` | port |
+| `PHANTOM_PC_ALLOW_COMMANDS` | `1` | allow `POST /command` shell execution |
 
 > **Security:** the gate can move your mouse, type, and (if enabled) run shell
-> commands. Run it only on a trusted LAN. Set `AMIRANET_PC_ALLOW_COMMANDS=0` to
+> commands. Run it only on a trusted LAN. Set `PHANTOM_PC_ALLOW_COMMANDS=0` to
 > disable shell commands.
 
 ## Phone side (the BRAIN), in Termux
@@ -50,12 +50,12 @@ ollama pull qwen2.5-vl:7b    # ~6 GB RAM (recommended)
 ollama pull minicpm-v:8b     # ~7 GB RAM (best)
 ```
 
-### 4. Get AMIRANET and run the brain
+### 4. Get PHANTOM and run the brain
 ```bash
 git clone <this-repo> && cd amiramnet
-export AMIRANET_PC_URL="http://192.168.1.50:8765"   # the PC's printed URL
-export AMIRANET_MODEL="qwen2.5-vl:7b"
-python -m amiranet.phone "your goal in plain language"
+export PHANTOM_PC_URL="http://192.168.1.50:8765"   # the PC's printed URL
+export PHANTOM_MODEL="qwen2.5-vl:7b"
+python -m phantom.phone "your goal in plain language"
 ```
 
 ### Keep Android from killing it
@@ -68,8 +68,8 @@ Tune for the phone with env vars:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `AMIRANET_MODEL` | `qwen2.5-vl:7b` | Ollama vision model |
-| `AMIRANET_NUM_THREADS` | `4` | CPU threads for Ollama (lower = cooler phone) |
-| `AMIRANET_MEMORY_WINDOW` | `4` | steps kept in the sliding-window memory |
-| `AMIRANET_MAX_STEPS` | `20` | safety cap per goal |
-| `AMIRANET_SCREENSHOT_SCALE` | `0.75` | downscale screenshots before sending |
+| `PHANTOM_MODEL` | `qwen2.5-vl:7b` | Ollama vision model |
+| `PHANTOM_NUM_THREADS` | `4` | CPU threads for Ollama (lower = cooler phone) |
+| `PHANTOM_MEMORY_WINDOW` | `4` | steps kept in the sliding-window memory |
+| `PHANTOM_MAX_STEPS` | `20` | safety cap per goal |
+| `PHANTOM_SCREENSHOT_SCALE` | `0.75` | downscale screenshots before sending |

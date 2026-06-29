@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import requests
 
-from amiranet.llm.base import LLMProvider, LLMResponse
+from phantom.llm.base import LLMProvider, LLMResponse
 
 
 class OllamaProvider(LLMProvider):

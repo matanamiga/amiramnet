@@ -1,4 +1,4 @@
-"""Run the phone brain: ``python -m amiranet.phone "<goal>"``.
+"""Run the phone brain: ``python -m phantom.phone "<goal>"``.
 
 Use ``--demo`` to run the full loop with a mock model and a no-op PC, so you
 can see the brain work with no Ollama, no phone, and no PC.
@@ -31,7 +31,7 @@ class _NoopPcClient:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="amiranet.phone", description="AMIRANET brain")
+    parser = argparse.ArgumentParser(prog="phantom.phone", description="PHANTOM brain")
     parser.add_argument("goal", nargs="?", default="Say hello on screen.")
     parser.add_argument("--demo", action="store_true", help="run offline with a mock model")
     args = parser.parse_args()

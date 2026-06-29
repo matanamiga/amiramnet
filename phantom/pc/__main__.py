@@ -1,6 +1,6 @@
-"""Run the PC gate: ``python -m amiranet.pc``.
+"""Run the PC gate: ``python -m phantom.pc``.
 
-Prints the LAN address to put into the phone's ``AMIRANET_PC_URL`` and starts
+Prints the LAN address to put into the phone's ``PHANTOM_PC_URL`` and starts
 the server.
 """
 
@@ -28,8 +28,8 @@ def main() -> None:
     config = PcConfig()
     ip = _lan_ip()
     print("=" * 48)
-    print("  AMIRANET GATE (PC body)")
-    print(f"  Put this in the phone's AMIRANET_PC_URL:")
+    print("  PHANTOM GATE (PC body)")
+    print(f"  Put this in the phone's PHANTOM_PC_URL:")
     print(f"      http://{ip}:{config.port}")
     print(f"  Commands enabled: {config.allow_commands}")
     print("=" * 48)

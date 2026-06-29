@@ -1,4 +1,4 @@
-"""AMIRANET — turn a phone into the brain of a computer.
+"""PHANTOM — turn a phone into the brain of a computer.
 
 The phone runs a local vision LLM (the "brain") that sees the PC screen and
 decides actions; the PC runs a worker (the "body") that captures the screen

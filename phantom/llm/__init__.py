@@ -4,9 +4,9 @@ The agent only depends on the :class:`LLMProvider` interface, so the reasoning
 engine can be swapped (local Ollama by default) without touching agent logic.
 """
 
-from amiranet.llm.base import LLMProvider, LLMResponse
-from amiranet.llm.mock_provider import MockProvider
-from amiranet.llm.ollama_provider import OllamaProvider
+from phantom.llm.base import LLMProvider, LLMResponse
+from phantom.llm.mock_provider import MockProvider
+from phantom.llm.ollama_provider import OllamaProvider
 
 __all__ = ["LLMProvider", "LLMResponse", "OllamaProvider", "MockProvider"]
 

@@ -27,7 +27,7 @@ from . import actions, screen
 
 def create_app(config: PcConfig | None = None) -> FastAPI:
     config = config or PcConfig()
-    app = FastAPI(title="AMIRANET Gate", version=__version__)
+    app = FastAPI(title="PHANTOM Gate", version=__version__)
 
     @app.get("/health")
     def health() -> dict:
@@ -62,5 +62,5 @@ def create_app(config: PcConfig | None = None) -> FastAPI:
     return app
 
 
-# Module-level default app for `uvicorn amiranet.pc.worker:app`.
+# Module-level default app for `uvicorn phantom.pc.worker:app`.
 app = create_app()

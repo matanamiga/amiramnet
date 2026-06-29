@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from amiranet.common.config import PhoneConfig
-from amiranet.common.protocol import Action, ActionResult, Screenshot
-from amiranet.llm import MockProvider
-from amiranet.phone import tools
-from amiranet.phone.agent import Agent
-from amiranet.phone.memory import SlidingMemory
+from phantom.common.config import PhoneConfig
+from phantom.common.protocol import Action, ActionResult, Screenshot
+from phantom.llm import MockProvider
+from phantom.phone import tools
+from phantom.phone.agent import Agent
+from phantom.phone.memory import SlidingMemory
 
 
 # --------------------------- memory --------------------------- #

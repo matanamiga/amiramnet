@@ -7,15 +7,15 @@ import types
 
 import pytest
 
-from amiranet.common.config import PcConfig
-from amiranet.common.protocol import (
+from phantom.common.config import PcConfig
+from phantom.common.protocol import (
     ClickAction,
     CommandRequest,
     KeyAction,
     TypeAction,
     WaitAction,
 )
-from amiranet.pc import actions
+from phantom.pc import actions
 
 
 def _fake_pyautogui(calls: list):
@@ -69,16 +69,16 @@ def test_run_command_disabled():
 
 def test_run_command_allowed():
     res = actions.run_command(
-        CommandRequest(command=f'{sys.executable} -c "print(\'amiranet-ok\')"'),
+        CommandRequest(command=f'{sys.executable} -c "print(\'phantom-ok\')"'),
         allow=True,
     )
     assert res.ok
-    assert "amiranet-ok" in res.stdout
+    assert "phantom-ok" in res.stdout
 
 
 def test_worker_endpoints():
     fastapi_testclient = pytest.importorskip("fastapi.testclient")
-    from amiranet.pc.worker import create_app
+    from phantom.pc.worker import create_app
 
     client = fastapi_testclient.TestClient(create_app(PcConfig(allow_commands=False)))
 

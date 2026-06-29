@@ -2,12 +2,12 @@
 
 Returns scripted completions in order, so the agent loop can be exercised with
 no Ollama, no phone, and no PC. Used by the test suite and by
-``python -m amiranet.phone --demo``.
+``python -m phantom.phone --demo``.
 """
 
 from __future__ import annotations
 
-from amiranet.llm.base import LLMProvider, LLMResponse
+from phantom.llm.base import LLMProvider, LLMResponse
 
 
 class MockProvider(LLMProvider):
@@ -15,7 +15,7 @@ class MockProvider(LLMProvider):
         # Default script: type a greeting, then declare the task done.
         self.scripted = scripted or [
             '{"thought": "I will type a greeting.", '
-            '"action": {"type": "type", "text": "hello from amiranet"}}',
+            '"action": {"type": "type", "text": "hello from phantom"}}',
             '{"thought": "Task complete.", '
             '"action": {"type": "done", "summary": "Typed the greeting."}}',
         ]

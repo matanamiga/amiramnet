@@ -15,10 +15,10 @@ from . import tools
 from .memory import SlidingMemory
 from .pc_client import PcClient
 
-log = logging.getLogger("amiranet.agent")
+log = logging.getLogger("phantom.agent")
 
 SYSTEM_PROMPT = """\
-You are AMIRANET, a local Large Action Model (LAM) running on a phone. You
+You are PHANTOM, a local Large Action Model (LAM) running on a phone. You
 operate a real computer on the user's behalf by looking at screenshots of its
 screen and issuing UI actions — exactly like a person using a mouse and
 keyboard. You do not call app APIs; you act by sight. Work autonomously toward

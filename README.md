@@ -1,8 +1,8 @@
-# AMIRANET
+# PHANTOM
 
 **A local DLAM — your phone is the brain, your PC is the hands.**
 
-AMIRANET turns a phone into a local **Large Action Model (LAM)** that operates
+PHANTOM turns a phone into a local **Large Action Model (LAM)** that operates
 your computer by *looking* at the screen and acting on it — like Rabbit r1 /
 DLAM, but with the critical difference: **nothing goes to the cloud.** The
 vision model runs locally on the phone (via Ollama), and everything stays
@@ -34,26 +34,26 @@ inside your own Wi-Fi.
 ### 1. PC (the gate)
 ```bash
 pip install -r requirements.txt
-python -m amiranet.pc
+python -m phantom.pc
 # prints: http://<your-LAN-IP>:8765   ← put this in the phone
 ```
 
 ### 2. Phone (the brain), in Termux
 See [`docs/SETUP.md`](docs/SETUP.md) for the full Termux + Ollama install.
 ```bash
-export AMIRANET_PC_URL="http://192.168.1.50:8765"   # from step 1
-export AMIRANET_MODEL="qwen2.5-vl:7b"
-python -m amiranet.phone "open the calculator and compute 12 * 9"
+export PHANTOM_PC_URL="http://192.168.1.50:8765"   # from step 1
+export PHANTOM_MODEL="qwen2.5-vl:7b"
+python -m phantom.phone "open the calculator and compute 12 * 9"
 ```
 
 ### Try it with no phone / no PC / no Ollama
 ```bash
-python -m amiranet.phone --demo
+python -m phantom.phone --demo
 ```
 
 ## Project layout
 ```
-amiranet/
+phantom/
   common/   protocol.py (phone↔PC contract) · config.py
   llm/      provider-agnostic vision LLM (Ollama default, mock for tests)
   pc/       the GATE: screen.py · actions.py · worker.py (FastAPI)
@@ -62,10 +62,15 @@ tests/      headless tests for both sides
 ```
 
 ## Roadmap
-This is **Phase 0** (working Python core). Later phases — each a separate
-session — add: PC `.exe` packaging, a one-line Termux installer, a native
-Android APK, an embedded on-device LLM, and auto-pairing. See the git history /
-issues for progress.
+Built in phases, each a separate session (so it never strains usage limits):
+
+- ✅ **Phase 0** — working Python core (phone LAM brain + PC gate, tested).
+- ✅ **Phase 1** — package the gate into `Phantom-Gate.exe` (double-click). See
+  [`docs/BUILD.md`](docs/BUILD.md).
+- ⬜ **Phase 2** — one-line Termux installer for the phone brain.
+- ⬜ **Phase 3** — native Android APK that talks to Ollama in Termux.
+- ⬜ **Phase 4** — embedded on-device LLM in the APK + built-in camera/vision.
+- ⬜ **Phase 5** — auto-pairing phone↔PC (QR / network discovery) + polish.
 
 ## Tests
 ```bash

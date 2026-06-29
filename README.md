@@ -1,0 +1,73 @@
+# AMIRANET
+
+**A local DLAM — your phone is the brain, your PC is the hands.**
+
+AMIRANET turns a phone into a local **Large Action Model (LAM)** that operates
+your computer by *looking* at the screen and acting on it — like Rabbit r1 /
+DLAM, but with the critical difference: **nothing goes to the cloud.** The
+vision model runs locally on the phone (via Ollama), and everything stays
+inside your own Wi-Fi.
+
+```
+┌─────────────────────────┐        Wi-Fi / HTTP        ┌──────────────────────────┐
+│   📱 PHONE — the brain    │ ─────────────────────────► │   💻 PC — the GATE (body) │
+│                          │  1. ask for a screenshot   │                          │
+│   Ollama (Qwen2.5-VL)    │ ◄──── 2. screen image ──── │   mss → screen capture    │
+│   VISION + LAM loop       │                            │                          │
+│   decides next action     │  3. send action ─────────► │   pyautogui → click/type  │
+│   sliding-window memory    │ ◄──── 4. result + screen ─ │   subprocess → commands   │
+│   loops until done        │                            │   (ZERO intelligence)     │
+└─────────────────────────┘                            └──────────────────────────┘
+```
+
+- **All intelligence on the phone.** Vision, planning, memory, the
+  observe→decide→act loop. The PC holds none.
+- **The PC is a dumb gate.** It only returns screenshots and executes the exact
+  action it's told. No model, no decisions.
+- **Local & private.** No cloud, no API keys, no passwords leaving your network.
+  The brain runs on local Ollama (zero token cost).
+- **Acts by sight, not APIs.** It works any app the way a person would — by
+  looking and clicking.
+
+## Quick start
+
+### 1. PC (the gate)
+```bash
+pip install -r requirements.txt
+python -m amiranet.pc
+# prints: http://<your-LAN-IP>:8765   ← put this in the phone
+```
+
+### 2. Phone (the brain), in Termux
+See [`docs/SETUP.md`](docs/SETUP.md) for the full Termux + Ollama install.
+```bash
+export AMIRANET_PC_URL="http://192.168.1.50:8765"   # from step 1
+export AMIRANET_MODEL="qwen2.5-vl:7b"
+python -m amiranet.phone "open the calculator and compute 12 * 9"
+```
+
+### Try it with no phone / no PC / no Ollama
+```bash
+python -m amiranet.phone --demo
+```
+
+## Project layout
+```
+amiranet/
+  common/   protocol.py (phone↔PC contract) · config.py
+  llm/      provider-agnostic vision LLM (Ollama default, mock for tests)
+  pc/       the GATE: screen.py · actions.py · worker.py (FastAPI)
+  phone/    the BRAIN: agent.py (LAM loop) · vision via llm · tools · memory
+tests/      headless tests for both sides
+```
+
+## Roadmap
+This is **Phase 0** (working Python core). Later phases — each a separate
+session — add: PC `.exe` packaging, a one-line Termux installer, a native
+Android APK, an embedded on-device LLM, and auto-pairing. See the git history /
+issues for progress.
+
+## Tests
+```bash
+python -m pytest -q
+```

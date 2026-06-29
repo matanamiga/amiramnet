@@ -1,0 +1,95 @@
+"""Tests for the PC gate — all run headlessly (no real display / pyautogui)."""
+
+from __future__ import annotations
+
+import sys
+import types
+
+import pytest
+
+from amiranet.common.config import PcConfig
+from amiranet.common.protocol import (
+    ClickAction,
+    CommandRequest,
+    KeyAction,
+    TypeAction,
+    WaitAction,
+)
+from amiranet.pc import actions
+
+
+def _fake_pyautogui(calls: list):
+    mod = types.SimpleNamespace(
+        FAILSAFE=True,
+        click=lambda **kw: calls.append(("click", kw)),
+        moveTo=lambda x, y: calls.append(("moveTo", (x, y))),
+        write=lambda text, interval=0.0: calls.append(("write", text)),
+        press=lambda k: calls.append(("press", k)),
+        hotkey=lambda *keys: calls.append(("hotkey", keys)),
+        scroll=lambda n: calls.append(("scroll", n)),
+    )
+    return mod
+
+
+def test_wait_action_needs_no_display():
+    res = actions.execute(WaitAction(seconds=0))
+    assert res.ok
+
+
+def test_actions_dispatch(monkeypatch):
+    calls: list = []
+    monkeypatch.setitem(sys.modules, "pyautogui", _fake_pyautogui(calls))
+
+    assert actions.execute(ClickAction(x=10, y=20, button="left", clicks=2)).ok
+    assert actions.execute(TypeAction(text="hi")).ok
+    assert actions.execute(KeyAction(keys=["ctrl", "c"])).ok
+    assert actions.execute(KeyAction(keys=["enter"])).ok
+
+    names = [c[0] for c in calls]
+    assert names == ["click", "write", "hotkey", "press"]
+    assert calls[0][1]["clicks"] == 2
+
+
+def test_action_failure_is_graceful(monkeypatch):
+    boom = types.SimpleNamespace(
+        FAILSAFE=False,
+        click=lambda **kw: (_ for _ in ()).throw(RuntimeError("no display")),
+    )
+    monkeypatch.setitem(sys.modules, "pyautogui", boom)
+    res = actions.execute(ClickAction(x=1, y=1))
+    assert not res.ok
+    assert "RuntimeError" in res.detail
+
+
+def test_run_command_disabled():
+    res = actions.run_command(CommandRequest(command="echo hi"), allow=False)
+    assert not res.ok
+    assert "disabled" in res.stderr
+
+
+def test_run_command_allowed():
+    res = actions.run_command(
+        CommandRequest(command=f'{sys.executable} -c "print(\'amiranet-ok\')"'),
+        allow=True,
+    )
+    assert res.ok
+    assert "amiranet-ok" in res.stdout
+
+
+def test_worker_endpoints():
+    fastapi_testclient = pytest.importorskip("fastapi.testclient")
+    from amiranet.pc.worker import create_app
+
+    client = fastapi_testclient.TestClient(create_app(PcConfig(allow_commands=False)))
+
+    assert client.get("/health").json() == {"ok": True}
+
+    info = client.get("/info").json()
+    assert set(info) >= {"hostname", "platform", "screen_width", "agent_version"}
+
+    body = {"action": {"type": "wait", "seconds": 0}}
+    res = client.post("/action", json=body).json()
+    assert res["ok"] is True
+
+    cmd = client.post("/command", json={"command": "echo hi", "timeout": 5}).json()
+    assert cmd["ok"] is False  # commands disabled in this config

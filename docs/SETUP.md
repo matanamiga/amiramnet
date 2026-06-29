@@ -28,6 +28,19 @@ Environment overrides:
 
 The phone hosts the vision model and the LAM loop.
 
+### Fast path — one-line installer
+After installing Termux (step 1 below), run:
+```bash
+curl -fsSL https://raw.githubusercontent.com/matanamiga/amiramnet/main/installer/termux_install.sh | bash
+```
+This installs Python + Ollama + the vision model, fetches Phantom, and adds a
+`phantom` command. Then just:
+```bash
+export PHANTOM_PC_URL=http://<pc-gate-url>
+phantom "your goal in plain language"
+```
+The manual steps below are the same thing, broken out.
+
 ### 1. Install Termux (from F-Droid, **not** Play Store)
 https://f-droid.org/packages/com.termux/
 

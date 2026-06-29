@@ -67,7 +67,8 @@ Built in phases, each a separate session (so it never strains usage limits):
 - ✅ **Phase 0** — working Python core (phone LAM brain + PC gate, tested).
 - ✅ **Phase 1** — package the gate into `Phantom-Gate.exe` (double-click). See
   [`docs/BUILD.md`](docs/BUILD.md).
-- ⬜ **Phase 2** — one-line Termux installer for the phone brain.
+- ✅ **Phase 2** — one-line Termux installer for the phone brain
+  (`installer/termux_install.sh`).
 - ⬜ **Phase 3** — native Android APK that talks to Ollama in Termux.
 - ⬜ **Phase 4** — embedded on-device LLM in the APK + built-in camera/vision.
 - ⬜ **Phase 5** — auto-pairing phone↔PC (QR / network discovery) + polish.

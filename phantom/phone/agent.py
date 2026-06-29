@@ -37,7 +37,7 @@ class Agent:
         pc: PcClient | None = None,
     ) -> None:
         self.config = config
-        self.pc = pc or PcClient(config.pc_url, config.request_timeout)
+        self.pc = pc or PcClient(config.pc_url, config.request_timeout, config.token)
         self.memory = SlidingMemory(config.memory_window)
         if llm is not None:
             self.llm = llm

@@ -19,6 +19,7 @@ Environment overrides:
 | `PHANTOM_PC_HOST` | `0.0.0.0` | bind address |
 | `PHANTOM_PC_PORT` | `8765` | port |
 | `PHANTOM_PC_ALLOW_COMMANDS` | `1` | allow `POST /command` shell execution |
+| `PHANTOM_TOKEN` | _(generated)_ | bearer token; auto-generated if unset. The gate prints a pairing code/QR carrying URL + token. |
 
 > **Security:** the gate can move your mouse, type, and (if enabled) run shell
 > commands. Run it only on a trusted LAN. Set `PHANTOM_PC_ALLOW_COMMANDS=0` to
@@ -86,3 +87,4 @@ Tune for the phone with env vars:
 | `PHANTOM_MEMORY_WINDOW` | `4` | steps kept in the sliding-window memory |
 | `PHANTOM_MAX_STEPS` | `20` | safety cap per goal |
 | `PHANTOM_SCREENSHOT_SCALE` | `0.75` | downscale screenshots before sending |
+| `PHANTOM_TOKEN` | _(empty)_ | bearer token; must match the gate's (from its pairing code) |

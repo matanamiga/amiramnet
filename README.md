@@ -73,7 +73,8 @@ Built in phases, each a separate session (so it never strains usage limits):
   brain. See [`docs/ANDROID.md`](docs/ANDROID.md).
 - ✅ **Phase 4** — the LAM loop ported into the APK (Kotlin): talks straight to
   local Ollama + the gate, no Termux needed. "Run on-device" button.
-- ⬜ **Phase 5** — auto-pairing phone↔PC (QR / network discovery) + polish.
+- ✅ **Phase 5** — token-secured gate + one-step pairing: the gate prints a
+  `PHANTOM:` code / QR; the app decodes it to fill URL + token.
 
 ## Tests
 ```bash

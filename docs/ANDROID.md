@@ -35,9 +35,17 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 > A debug APK is unsigned-for-store but installable for personal use. For a
 > shareable release APK, create a keystore and configure `signingConfigs`.
 
+## Pairing (Phase 5)
+The gate is token-secured: on start it prints a `PHANTOM:<code>` and a QR. In
+the app, paste that code into **Pairing code** and tap **Pair** — it fills the
+PC URL + token (and model) in one step. The token is then sent as
+`Authorization: Bearer <token>` on every gate request. (Scanning the QR with any
+QR app gives you the same code to paste; in-app camera scanning is future work.)
+
 ## Using it
-1. Start the gate on your PC (`Phantom-Gate.exe`) and note the URL.
-2. Open Phantom on the phone, enter the PC gate URL + model, type a goal.
+1. Start the gate on your PC (`Phantom-Gate.exe`) and note the URL / pairing code.
+2. Open Phantom on the phone, paste the pairing code and tap Pair (or enter the
+   PC gate URL + model by hand), type a goal.
 3. Choose how to run:
    - **Run via Termux** — drives the `phantom` command in Termux (Phase 3).
    - **Run on-device** — runs the LAM loop *inside the app* (Phase 4), talking

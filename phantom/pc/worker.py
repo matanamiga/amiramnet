@@ -8,9 +8,10 @@ the phone.
 from __future__ import annotations
 
 import platform
+import secrets
 import socket
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Header, HTTPException
 
 from .. import __version__
 from ..common.config import PcConfig
@@ -27,7 +28,17 @@ from . import actions, screen
 
 def create_app(config: PcConfig | None = None) -> FastAPI:
     config = config or PcConfig()
+    # No token configured -> generate one so the gate is never unprotected.
+    if not config.token:
+        config.token = secrets.token_urlsafe(16)
     app = FastAPI(title="PHANTOM Gate", version=__version__)
+    app.state.config = config
+
+    def require_token(authorization: str | None = Header(default=None)) -> None:
+        """Reject sensitive calls lacking a matching bearer token."""
+        expected = f"Bearer {config.token}"
+        if not authorization or not secrets.compare_digest(authorization, expected):
+            raise HTTPException(status_code=401, detail="invalid or missing token")
 
     @app.get("/health")
     def health() -> dict:
@@ -47,15 +58,15 @@ def create_app(config: PcConfig | None = None) -> FastAPI:
             agent_version=__version__,
         )
 
-    @app.get("/screenshot", response_model=Screenshot)
+    @app.get("/screenshot", response_model=Screenshot, dependencies=[Depends(require_token)])
     def screenshot(scale: float = 1.0) -> Screenshot:
         return screen.capture(scale=scale)
 
-    @app.post("/action", response_model=ActionResult)
+    @app.post("/action", response_model=ActionResult, dependencies=[Depends(require_token)])
     def action(envelope: ActionEnvelope) -> ActionResult:
         return actions.execute(envelope.action)
 
-    @app.post("/command", response_model=CommandResult)
+    @app.post("/command", response_model=CommandResult, dependencies=[Depends(require_token)])
     def command(req: CommandRequest) -> CommandResult:
         return actions.run_command(req, allow=config.allow_commands)
 

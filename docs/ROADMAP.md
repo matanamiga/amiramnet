@@ -12,7 +12,7 @@ limits. The Python core is provider-local (Ollama) — zero API cost.
 | 2 | One-line Termux installer for the brain | ✅ done |
 | 3 | Native Android APK shell (Kotlin) driving the Termux brain | ✅ done |
 | 4 | LAM loop ported into the APK (Kotlin) — direct Ollama + gate | ✅ done |
-| 5 | Auto-pairing phone↔PC (QR / discovery) + polish | ⬜ next |
+| 5 | Token-secured gate + one-step pairing code / QR | ✅ done |
 
 ## Phase 3 kickoff brief (start here next session)
 
@@ -36,17 +36,14 @@ Recommended approach — thinnest viable native shell:
 Watch the Max limit: scaffold + UI + one happy-path run is plenty for one
 session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
 
-## Phase 5 kickoff brief (start here next session)
-Goal: remove manual setup — phone and PC find each other and pair.
-1. PC gate: add mDNS/zeroconf advertisement (or a simple UDP broadcast
-   beacon) and print a QR encoding `{url, token}`.
-2. Android app: scan the QR (CameraX + ML Kit barcode) or auto-discover the
-   gate on the LAN; store the paired URL/token; send the token on every request.
-3. Gate: require the token (simple bearer check in `phantom/pc/worker.py`).
-4. Polish: foreground service for long runs, stop button, dark theme already on.
-Keep within the Max limit — pairing happy-path + token auth is one session.
+## Possible future work (all 6 planned phases are done)
+- In-app camera QR scanning (CameraX + ML Kit) instead of pasting the code.
+- mDNS/zeroconf auto-discovery of the gate on the LAN.
+- A foreground service + Stop button for long on-device runs.
+- Real device E2E run + screenshots; signed release APK.
 
 ## Session log
-- Session 1: phases 0–4. Rebranded amiranet → Phantom; Python core + EXE
-  packaging + Termux installer + native APK shell + on-device Kotlin LAM loop.
+- Session 1: phases 0–5 (all planned). Rebranded amiranet → Phantom; Python
+  core + EXE packaging + Termux installer + native APK shell + on-device Kotlin
+  LAM loop + token-secured gate with pairing code/QR. 15 Python tests green.
   Branch `claude/code-subagents-project-id3k4o`.

@@ -10,15 +10,18 @@ import org.json.JSONObject
  * HTTP client for the PC gate. Kotlin port of phantom/phone/pc_client.py, using
  * the same wire contract (GET /screenshot, POST /action).
  */
-class PcClient(baseUrl: String, private val client: OkHttpClient) {
+class PcClient(baseUrl: String, private val client: OkHttpClient, private val token: String = "") {
 
     private val base = baseUrl.trimEnd('/')
     private val jsonMedia = "application/json".toMediaType()
 
     data class Shot(val imageB64: String, val width: Int, val height: Int)
 
+    private fun Request.Builder.auth(): Request.Builder =
+        if (token.isNotEmpty()) header("Authorization", "Bearer $token") else this
+
     fun screenshot(scale: Double): Shot {
-        val req = Request.Builder().url("$base/screenshot?scale=$scale").get().build()
+        val req = Request.Builder().url("$base/screenshot?scale=$scale").auth().get().build()
         client.newCall(req).execute().use { r ->
             if (!r.isSuccessful) error("gate /screenshot returned HTTP ${r.code}")
             val o = JSONObject(r.body?.string().orEmpty())
@@ -29,7 +32,7 @@ class PcClient(baseUrl: String, private val client: OkHttpClient) {
     /** POST an executable action (already a {"type":...} object) to the gate. */
     fun doAction(action: JSONObject): String {
         val body = JSONObject().put("action", action).toString().toRequestBody(jsonMedia)
-        val req = Request.Builder().url("$base/action").post(body).build()
+        val req = Request.Builder().url("$base/action").auth().post(body).build()
         client.newCall(req).execute().use { r ->
             if (!r.isSuccessful) error("gate /action returned HTTP ${r.code}")
             val o = JSONObject(r.body?.string().orEmpty())

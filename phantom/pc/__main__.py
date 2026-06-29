@@ -9,6 +9,7 @@ from __future__ import annotations
 import socket
 
 from ..common.config import PcConfig
+from . import pairing
 from .worker import create_app
 
 
@@ -26,17 +27,32 @@ def _lan_ip() -> str:
 
 def main() -> None:
     config = PcConfig()
+    # Build the app first so it fills in a generated token when none was set.
+    app = create_app(config)
+    config = app.state.config
+
     ip = _lan_ip()
-    print("=" * 48)
+    url = f"http://{ip}:{config.port}"
+    code = pairing.encode_pairing(url, config.token, "")
+
+    print("=" * 56)
     print("  PHANTOM GATE (PC body)")
-    print(f"  Put this in the phone's PHANTOM_PC_URL:")
-    print(f"      http://{ip}:{config.port}")
+    print(f"  URL:   {url}")
+    print(f"  Token: {config.token}")
     print(f"  Commands enabled: {config.allow_commands}")
-    print("=" * 48)
+    print("-" * 56)
+    print("  Scan this in the Phantom app to pair, or paste the code:")
+    qr = pairing.render_qr(code)
+    if qr:
+        print(qr)
+    else:
+        print("  (install 'qrcode' for a scannable QR)")
+    print(f"  Pairing code: {code}")
+    print("=" * 56)
 
     import uvicorn
 
-    uvicorn.run(create_app(config), host=config.host, port=config.port)
+    uvicorn.run(app, host=config.host, port=config.port)
 
 
 if __name__ == "__main__":

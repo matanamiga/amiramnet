@@ -22,6 +22,9 @@ class PcConfig:
     port: int = int(_env("PHANTOM_PC_PORT", "8765"))
     # Allow shell commands via POST /command. Off by default for safety.
     allow_commands: bool = _env("PHANTOM_PC_ALLOW_COMMANDS", "1") == "1"
+    # Shared secret. If empty, the gate generates one at startup. When set, the
+    # phone must send `Authorization: Bearer <token>` on sensitive endpoints.
+    token: str = _env("PHANTOM_TOKEN", "")
 
 
 @dataclass
@@ -40,3 +43,5 @@ class PhoneConfig:
     # Downscale screenshots before sending to the model to save RAM / latency.
     screenshot_scale: float = float(_env("PHANTOM_SCREENSHOT_SCALE", "0.75"))
     request_timeout: float = float(_env("PHANTOM_REQUEST_TIMEOUT", "120"))
+    # Bearer token for the PC gate (must match the gate's token if it has one).
+    token: str = _env("PHANTOM_TOKEN", "")

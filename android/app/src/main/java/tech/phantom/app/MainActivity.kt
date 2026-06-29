@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import okhttp3.OkHttpClient
 import tech.phantom.app.core.Agent
 import tech.phantom.app.core.OllamaClient
+import tech.phantom.app.core.Pairing
 import tech.phantom.app.core.PcClient
 import java.util.concurrent.TimeUnit
 
@@ -42,6 +43,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         prefs = getSharedPreferences("phantom", Context.MODE_PRIVATE)
 
+        val pairingCode = findViewById<EditText>(R.id.pairingCode)
+        val pairBtn = findViewById<Button>(R.id.pairButton)
         val pcUrl = findViewById<EditText>(R.id.pcUrl)
         val model = findViewById<EditText>(R.id.model)
         val ollamaUrl = findViewById<EditText>(R.id.ollamaUrl)
@@ -53,6 +56,19 @@ class MainActivity : AppCompatActivity() {
         pcUrl.setText(prefs.getString("pc_url", "http://192.168.1.50:8765"))
         model.setText(prefs.getString("model", "qwen2.5-vl:7b"))
         ollamaUrl.setText(prefs.getString("ollama_url", "http://127.0.0.1:11434"))
+
+        // Pairing: decode the gate's PHANTOM:… code into URL + token (+ model).
+        pairBtn.setOnClickListener {
+            try {
+                val p = Pairing.decode(pairingCode.text.toString())
+                pcUrl.setText(p.url)
+                if (p.model.isNotEmpty()) model.setText(p.model)
+                prefs.edit().putString("token", p.token).apply()
+                appendLog("✓ Paired with ${p.url}")
+            } catch (e: Exception) {
+                appendLog("Bad pairing code: ${e.message}")
+            }
+        }
 
         fun readInputs(): Triple<String, String, String>? {
             val url = pcUrl.text.toString().trim()
@@ -74,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             val (url, mdl, g) = readInputs() ?: return@setOnClickListener
             appendLog("▶ Termux: $g")
             try {
-                TermuxRunner.run(this, url, mdl, g, resultPendingIntent())
+                TermuxRunner.run(this, url, mdl, token(), g, resultPendingIntent())
             } catch (e: Exception) {
                 appendLog("Failed to reach Termux: ${e.message}\n" +
                     "Is Termux installed and 'allow-external-apps' enabled?")
@@ -89,11 +105,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun token(): String = prefs.getString("token", "").orEmpty()
+
     /** Run the Kotlin LAM loop off the UI thread, streaming progress to the log. */
     private fun runOnDevice(pcUrl: String, ollamaUrl: String, model: String, goal: String) {
         Thread {
             val agent = Agent(
-                pc = PcClient(pcUrl, http),
+                pc = PcClient(pcUrl, http, token()),
                 ollama = OllamaClient(ollamaUrl, model, numThreads = 4, client = http),
             )
             val summary = agent.run(goal) { line -> runOnUiThread { appendLog(line) } }

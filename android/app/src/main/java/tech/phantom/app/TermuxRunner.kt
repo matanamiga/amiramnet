@@ -28,13 +28,14 @@ object TermuxRunner {
         context: Context,
         pcUrl: String,
         model: String,
+        token: String,
         goal: String,
         result: PendingIntent,
     ) {
         // Escape double quotes so the goal survives the shell.
         val safeGoal = goal.replace("\"", "\\\"")
         val script =
-            "PHANTOM_PC_URL='$pcUrl' PHANTOM_MODEL='$model' phantom \"$safeGoal\""
+            "PHANTOM_PC_URL='$pcUrl' PHANTOM_MODEL='$model' PHANTOM_TOKEN='$token' phantom \"$safeGoal\""
 
         val intent = Intent().apply {
             setClassName(TERMUX_PKG, RUN_SERVICE)

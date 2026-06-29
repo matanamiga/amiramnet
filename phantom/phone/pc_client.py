@@ -17,18 +17,23 @@ from ..common.protocol import (
 class PcClient:
     """Thin wrapper over the PC gate's HTTP endpoints."""
 
-    def __init__(self, base_url: str, timeout: float = 120.0) -> None:
+    def __init__(self, base_url: str, timeout: float = 120.0, token: str = "") -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self._headers = {"Authorization": f"Bearer {token}"} if token else {}
 
     def _get(self, path: str, **params) -> dict:
-        r = requests.get(f"{self.base_url}{path}", params=params, timeout=self.timeout)
+        r = requests.get(
+            f"{self.base_url}{path}", params=params, headers=self._headers, timeout=self.timeout
+        )
         if r.status_code != 200:
             raise RuntimeError(f"GET {path} -> {r.status_code}: {r.text[:200]}")
         return r.json()
 
     def _post(self, path: str, body: dict) -> dict:
-        r = requests.post(f"{self.base_url}{path}", json=body, timeout=self.timeout)
+        r = requests.post(
+            f"{self.base_url}{path}", json=body, headers=self._headers, timeout=self.timeout
+        )
         if r.status_code != 200:
             raise RuntimeError(f"POST {path} -> {r.status_code}: {r.text[:200]}")
         return r.json()

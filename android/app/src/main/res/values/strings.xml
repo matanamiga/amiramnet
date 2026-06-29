@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Phantom</string>
     <string name="tagline">Your phone is the brain. Your PC is the hands.</string>
+    <string name="label_pairing">Pairing code (from the PC gate)</string>
+    <string name="hint_pairing">PHANTOM:…  (scan the gate\'s QR, paste here)</string>
+    <string name="pair">Pair</string>
     <string name="label_pc_url">PC gate URL</string>
     <string name="hint_pc_url">http://192.168.1.50:8765</string>
     <string name="label_model">Vision model</string>

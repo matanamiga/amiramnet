@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A simple ghost glyph centred in the adaptive-icon safe zone. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30
+            C44,30 36,38 36,48
+            L36,74
+            C36,76 38,77 40,75
+            L44,71
+            C45,70 47,70 48,71
+            L52,75
+            C53,76 55,76 56,75
+            L60,71
+            C61,70 63,70 64,71
+            L68,75
+            C70,77 72,76 72,74
+            L72,48
+            C72,38 64,30 54,30 Z" />
+    <path
+        android:fillColor="#1B1033"
+        android:pathData="M48,46 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+    <path
+        android:fillColor="#1B1033"
+        android:pathData="M60,46 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+</vector>

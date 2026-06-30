@@ -41,7 +41,8 @@ session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
 - ✅ Foreground service + Stop button for long on-device runs — `PhantomService`.
 - ✅ CI builds the debug APK on every push (downloadable artifact) + runs
   pytest — the Android app is verified to compile.
-- mDNS/zeroconf auto-discovery of the gate on the LAN.
+- ✅ mDNS/zeroconf auto-discovery — the gate advertises `_phantom._tcp`; the app
+  has a "Find gate on Wi-Fi" button (`GateDiscovery` / `phantom/pc/discovery.py`).
 - Real device E2E run + screenshots; signed release APK.
 
 ## Session log

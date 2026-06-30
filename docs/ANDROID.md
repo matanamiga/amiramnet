@@ -36,11 +36,16 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 > shareable release APK, create a keystore and configure `signingConfigs`.
 
 ## Pairing (Phase 5)
-The gate is token-secured: on start it prints a `PHANTOM:<code>` and a QR. To
-pair, either tap **Scan QR** and point the camera at the gate's QR (CameraX +
-ML Kit, in `ScanActivity`), or paste the code into **Pairing code** and tap
-**Pair**. Either way it fills the PC URL + token (and model) in one step, and
-the token is sent as `Authorization: Bearer <token>` on every gate request.
+The gate is token-secured: on start it prints a `PHANTOM:<code>` and a QR.
+Three ways to pair, easiest first:
+- **Find gate on Wi-Fi** — auto-discovers the gate over mDNS (`GateDiscovery`
+  via NsdManager) and fills URL + token with zero typing.
+- **Scan QR** — point the camera at the gate's QR (CameraX + ML Kit,
+  `ScanActivity`).
+- **Pairing code** — paste the `PHANTOM:` code and tap **Pair**.
+
+Either way it fills the PC URL + token (and model) in one step, and the token
+is sent as `Authorization: Bearer <token>` on every gate request.
 
 ## Using it
 1. Start the gate on your PC (`Phantom-Gate.exe`) and note the URL / pairing code.

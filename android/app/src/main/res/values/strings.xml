@@ -5,6 +5,7 @@
     <string name="label_pairing">Pairing code (from the PC gate)</string>
     <string name="hint_pairing">PHANTOM:…  (scan the gate\'s QR, paste here)</string>
     <string name="pair">Pair</string>
+    <string name="discover">Find gate on Wi-Fi</string>
     <string name="scan_qr">Scan QR</string>
     <string name="scan_hint">Point the camera at the gate\'s QR code</string>
     <string name="label_pc_url">PC gate URL</string>

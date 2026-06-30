@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import tech.phantom.app.core.GateDiscovery
 import tech.phantom.app.core.Pairing
 
 /**
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         ollamaUrl = findViewById(R.id.ollamaUrl)
         val goal = findViewById<EditText>(R.id.goal)
         logView = findViewById(R.id.log)
+        val discoverBtn = findViewById<Button>(R.id.discoverButton)
         val scanBtn = findViewById<Button>(R.id.scanButton)
         val pairBtn = findViewById<Button>(R.id.pairButton)
         val runTermuxBtn = findViewById<Button>(R.id.runButton)
@@ -61,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         model.setText(prefs.getString("model", "qwen2.5-vl:7b"))
         ollamaUrl.setText(prefs.getString("ollama_url", "http://127.0.0.1:11434"))
 
+        discoverBtn.setOnClickListener { startDiscovery() }
         scanBtn.setOnClickListener { scanLauncher.launch(Intent(this, ScanActivity::class.java)) }
         pairBtn.setOnClickListener { applyPairing(pairingCode.text.toString()) }
 
@@ -85,6 +88,26 @@ class MainActivity : AppCompatActivity() {
         stopBtn.setOnClickListener {
             startService(Intent(this, PhantomService::class.java).setAction(PhantomService.ACTION_STOP))
             appendLog("■ Stopping…")
+        }
+    }
+
+    private var discovery: GateDiscovery? = null
+
+    /** Find a gate on the LAN via mDNS and auto-fill URL + token. */
+    private fun startDiscovery() {
+        discovery?.stop()
+        appendLog("⌕ Searching the Wi-Fi for a gate…")
+        discovery = GateDiscovery(this).also { d ->
+            d.start(
+                onFound = { found ->
+                    runOnUiThread {
+                        pcUrl.setText(found.url)
+                        prefs.edit().putString("token", found.token).apply()
+                        appendLog("✓ Found gate at ${found.url}")
+                    }
+                },
+                onError = { msg -> runOnUiThread { appendLog("Discovery: $msg") } },
+            )
         }
     }
 
@@ -152,6 +175,8 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         listener = null
+        discovery?.stop()
+        discovery = null
     }
 
     companion object {

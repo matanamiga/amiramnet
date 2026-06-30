@@ -6,10 +6,11 @@ the server.
 
 from __future__ import annotations
 
+import os
 import socket
 
 from ..common.config import PcConfig
-from . import pairing
+from . import discovery, pairing
 from .worker import create_app
 
 
@@ -48,11 +49,21 @@ def main() -> None:
     else:
         print("  (install 'qrcode' for a scannable QR)")
     print(f"  Pairing code: {code}")
+
+    # Advertise on the LAN so phones can auto-discover the gate (best-effort).
+    advertiser = None
+    if os.environ.get("PHANTOM_DISCOVERY", "1") == "1":
+        advertiser = discovery.advertise(ip, config.port, config.token)
+        print(f"  mDNS discovery: {'on' if advertiser else 'unavailable (pip install zeroconf)'}")
     print("=" * 56)
 
     import uvicorn
 
-    uvicorn.run(app, host=config.host, port=config.port)
+    try:
+        uvicorn.run(app, host=config.host, port=config.port)
+    finally:
+        if advertiser:
+            advertiser.close()
 
 
 if __name__ == "__main__":

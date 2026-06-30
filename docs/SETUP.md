@@ -20,6 +20,7 @@ Environment overrides:
 | `PHANTOM_PC_PORT` | `8765` | port |
 | `PHANTOM_PC_ALLOW_COMMANDS` | `1` | allow `POST /command` shell execution |
 | `PHANTOM_TOKEN` | _(generated)_ | bearer token; auto-generated if unset. The gate prints a pairing code/QR carrying URL + token. |
+| `PHANTOM_DISCOVERY` | `1` | advertise the gate over mDNS so phones can auto-find it (`pip install zeroconf`); set `0` to disable. |
 
 > **Security:** the gate can move your mouse, type, and (if enabled) run shell
 > commands. Run it only on a trusted LAN. Set `PHANTOM_PC_ALLOW_COMMANDS=0` to

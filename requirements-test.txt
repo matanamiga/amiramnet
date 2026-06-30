@@ -7,3 +7,4 @@ uvicorn>=0.27
 httpx>=0.27
 qrcode>=7.0
 pytest>=8.0
+zeroconf>=0.131

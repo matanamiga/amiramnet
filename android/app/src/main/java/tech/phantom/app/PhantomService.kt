@@ -12,8 +12,11 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import okhttp3.OkHttpClient
 import tech.phantom.app.core.Agent
+import tech.phantom.app.core.ModelManager
 import tech.phantom.app.core.OllamaClient
+import tech.phantom.app.core.OnDeviceLlm
 import tech.phantom.app.core.PcClient
+import tech.phantom.app.core.VisionLlm
 import java.util.concurrent.TimeUnit
 
 /**

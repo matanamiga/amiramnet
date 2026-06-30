@@ -59,4 +59,7 @@ dependencies {
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
     // Embedded on-device LLM (Phase 6): MediaPipe LLM Inference (vision).
     implementation("com.google.mediapipe:tasks-genai:0.10.24")
+    // Provides com.google.mediapipe.framework.image.{MPImage,BitmapImageBuilder}
+    // used to pass screenshots into the vision model.
+    implementation("com.google.mediapipe:tasks-vision:0.10.24")
 }

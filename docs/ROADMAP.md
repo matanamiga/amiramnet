@@ -44,6 +44,10 @@ session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
 - ✅ mDNS/zeroconf auto-discovery — the gate advertises `_phantom._tcp`; the app
   has a "Find gate on Wi-Fi" button (`GateDiscovery` / `phantom/pc/discovery.py`).
 - ✅ Signed release APK support (optional keystore via `PHANTOM_KEYSTORE` env).
+- ✅ Embedded on-device model (MediaPipe LLM Inference) — runs the vision model
+  inside the APK, no Ollama/Termux. `OnDeviceLlm` + `ModelManager` + a
+  `VisionLlm` interface; engine toggle in the UI. (Compile-verified in CI;
+  runtime needs a device + a downloaded `.task` model.)
 - Real device E2E run + screenshots (needs physical hardware).
 
 ## Session log

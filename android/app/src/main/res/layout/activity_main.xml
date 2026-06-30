@@ -97,6 +97,27 @@
             android:inputType="textUri"
             android:importantForAutofill="no" />
 
+        <CheckBox
+            android:id="@+id/useOnDevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/use_on_device" />
+
+        <EditText
+            android:id="@+id/modelUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_model_url"
+            android:inputType="textUri"
+            android:importantForAutofill="no" />
+
+        <Button
+            android:id="@+id/downloadModelButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/download_model" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -16,11 +16,11 @@ class OllamaClient(
     private val model: String,
     private val numThreads: Int,
     private val client: OkHttpClient,
-) {
+) : VisionLlm {
     private val base = ollamaUrl.trimEnd('/')
     private val jsonMedia = "application/json".toMediaType()
 
-    fun generate(system: String, prompt: String, imagesB64: List<String>): String {
+    override fun generate(system: String, prompt: String, imageB64: String): String {
         val payload = JSONObject()
             .put("model", model)
             .put("system", system)
@@ -28,10 +28,8 @@ class OllamaClient(
             .put("stream", false)
             // Cap CPU threads so the phone stays responsive while thinking.
             .put("options", JSONObject().put("num_thread", numThreads))
-        if (imagesB64.isNotEmpty()) {
-            val arr = JSONArray()
-            imagesB64.forEach { arr.put(it) }
-            payload.put("images", arr)
+        if (imageB64.isNotEmpty()) {
+            payload.put("images", JSONArray().put(imageB64))
         }
         val req = Request.Builder()
             .url("$base/api/generate")

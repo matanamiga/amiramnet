@@ -14,6 +14,9 @@
     <string name="hint_model">qwen2.5-vl:7b</string>
     <string name="label_ollama">Ollama URL (on phone)</string>
     <string name="hint_ollama">http://127.0.0.1:11434</string>
+    <string name="use_on_device">Use on-device model (no Ollama / no Termux)</string>
+    <string name="hint_model_url">Model .task download URL (first run only)</string>
+    <string name="download_model">Download model</string>
     <string name="label_goal">Goal</string>
     <string name="hint_goal">open the calculator and compute 12 * 9</string>
     <string name="run_termux">Run via Termux</string>

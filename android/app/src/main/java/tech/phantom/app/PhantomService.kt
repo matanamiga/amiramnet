@@ -39,6 +39,7 @@ class PhantomService : Service() {
         val model = intent?.getStringExtra(EXTRA_MODEL).orEmpty()
         val token = intent?.getStringExtra(EXTRA_TOKEN).orEmpty()
         val goal = intent?.getStringExtra(EXTRA_GOAL).orEmpty()
+        val engine = intent?.getStringExtra(EXTRA_ENGINE).orEmpty()
 
         startForeground(NOTIF_ID, notification("Running: $goal"))
 
@@ -47,17 +48,28 @@ class PhantomService : Service() {
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(180, TimeUnit.SECONDS)
                 .build()
-            val agent = Agent(
-                pc = PcClient(pcUrl, http, token),
-                ollama = OllamaClient(ollamaUrl, model, numThreads = 4, client = http),
-            )
-            val summary = agent.run(goal, isCancelled = { cancelled }) { line ->
-                MainActivity.deliver(line)
-                updateNotification(line)
+            var onDevice: OnDeviceLlm? = null
+            try {
+                val llm: VisionLlm = if (engine == "ondevice") {
+                    val mm = ModelManager(applicationContext, http)
+                    if (!mm.isPresent()) error("on-device model not downloaded yet")
+                    OnDeviceLlm(applicationContext, mm.modelFile().absolutePath).also { onDevice = it }
+                } else {
+                    OllamaClient(ollamaUrl, model, numThreads = 4, client = http)
+                }
+                val agent = Agent(pc = PcClient(pcUrl, http, token), llm = llm)
+                val summary = agent.run(goal, isCancelled = { cancelled }) { line ->
+                    MainActivity.deliver(line)
+                    updateNotification(line)
+                }
+                MainActivity.deliver("— $summary —")
+            } catch (e: Exception) {
+                MainActivity.deliver("Engine error: ${e.message}")
+            } finally {
+                onDevice?.close()
+                stopForegroundCompat()
+                stopSelf()
             }
-            MainActivity.deliver("— $summary —")
-            stopForegroundCompat()
-            stopSelf()
         }.also { it.start() }
 
         return START_NOT_STICKY
@@ -111,6 +123,7 @@ class PhantomService : Service() {
         const val EXTRA_MODEL = "model"
         const val EXTRA_TOKEN = "token"
         const val EXTRA_GOAL = "goal"
+        const val EXTRA_ENGINE = "engine"
         private const val CHANNEL = "phantom_runs"
         private const val NOTIF_ID = 1
     }

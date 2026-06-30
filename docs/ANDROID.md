@@ -75,6 +75,22 @@ is sent as `Authorization: Bearer <token>` on every gate request.
      Termux command needed; Ollama must still be reachable on the phone.
 4. The brain sees the PC screen and acts; progress streams to the app's log.
 
+## Embedded model — no Ollama, no Termux (Phase 6)
+The app can run the vision model **inside the APK** via MediaPipe LLM Inference
+(`OnDeviceLlm`), so Ollama/Termux aren't needed at all:
+1. Get a MediaPipe vision `.task` model (e.g. Gemma 3n) and host it at a direct
+   URL (some models require accepting a license / an authenticated link).
+2. In the app: paste the URL, tap **Download model** (it's GBs — once only).
+3. Tick **Use on-device model** and tap **Run on-device**.
+
+`ModelManager` stores the model in app storage; `PhantomService` builds
+`OnDeviceLlm` instead of `OllamaClient` when the engine is on-device. Both
+implement the `VisionLlm` interface, so the agent loop is identical.
+
+> Honest caveat: on-device inference is **not faster** than Ollama — both run
+> the same class of model on the same phone. The win is packaging (one APK, no
+> Termux). Needs a phone with enough RAM; expect slow steps.
+
 ## On-device loop (Phase 4)
 `core/Agent.kt` is a Kotlin port of `phantom/phone/agent.py`: observe (gate
 screenshot) → decide (local Ollama vision) → act (gate), with the same tool

@@ -9,7 +9,7 @@ package tech.phantom.app.core
  */
 class Agent(
     private val pc: PcClient,
-    private val ollama: OllamaClient,
+    private val llm: VisionLlm,
     private val maxSteps: Int = 20,
     private val scale: Double = 0.75,
     memoryWindow: Int = 4,
@@ -38,7 +38,7 @@ class Agent(
                     append("Here is the current screen (")
                     append(shot.width).append("x").append(shot.height).append(").")
                 }
-                val text = ollama.generate(system, prompt, listOf(shot.imageB64))
+                val text = llm.generate(system, prompt, shot.imageB64)
                 val decision = Tools.parseDecision(text)
                 val thought = decision.optString("thought")
                 val action = decision.getJSONObject("action")

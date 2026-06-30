@@ -7,13 +7,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import okhttp3.OkHttpClient
 import tech.phantom.app.core.GateDiscovery
+import tech.phantom.app.core.ModelManager
 import tech.phantom.app.core.Pairing
+import java.util.concurrent.TimeUnit
 
 /**
  * Phantom — the phone brain's front-end.
@@ -30,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pcUrl: EditText
     private lateinit var model: EditText
     private lateinit var ollamaUrl: EditText
+    private lateinit var modelUrl: EditText
+    private lateinit var useOnDevice: CheckBox
 
     private val scanLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
@@ -50,8 +56,11 @@ class MainActivity : AppCompatActivity() {
         pcUrl = findViewById(R.id.pcUrl)
         model = findViewById(R.id.model)
         ollamaUrl = findViewById(R.id.ollamaUrl)
+        modelUrl = findViewById(R.id.modelUrl)
+        useOnDevice = findViewById(R.id.useOnDevice)
         val goal = findViewById<EditText>(R.id.goal)
         logView = findViewById(R.id.log)
+        val downloadBtn = findViewById<Button>(R.id.downloadModelButton)
         val discoverBtn = findViewById<Button>(R.id.discoverButton)
         val scanBtn = findViewById<Button>(R.id.scanButton)
         val pairBtn = findViewById<Button>(R.id.pairButton)
@@ -62,7 +71,10 @@ class MainActivity : AppCompatActivity() {
         pcUrl.setText(prefs.getString("pc_url", "http://192.168.1.50:8765"))
         model.setText(prefs.getString("model", "qwen2.5-vl:7b"))
         ollamaUrl.setText(prefs.getString("ollama_url", "http://127.0.0.1:11434"))
+        modelUrl.setText(prefs.getString("model_url", ""))
+        useOnDevice.isChecked = prefs.getBoolean("use_on_device", false)
 
+        downloadBtn.setOnClickListener { downloadModel(modelUrl.text.toString().trim()) }
         discoverBtn.setOnClickListener { startDiscovery() }
         scanBtn.setOnClickListener { scanLauncher.launch(Intent(this, ScanActivity::class.java)) }
         pairBtn.setOnClickListener { applyPairing(pairingCode.text.toString()) }
@@ -144,13 +156,45 @@ class MainActivity : AppCompatActivity() {
 
     /** Run the LAM loop in a foreground service so it survives backgrounding. */
     private fun runOnDevice(pcUrl: String, ollamaUrl: String, model: String, goal: String) {
+        prefs.edit().putBoolean("use_on_device", useOnDevice.isChecked).apply()
+        val engine = if (useOnDevice.isChecked) "ondevice" else "ollama"
         val intent = Intent(this, PhantomService::class.java)
             .putExtra(PhantomService.EXTRA_PC_URL, pcUrl)
             .putExtra(PhantomService.EXTRA_OLLAMA_URL, ollamaUrl)
             .putExtra(PhantomService.EXTRA_MODEL, model)
             .putExtra(PhantomService.EXTRA_TOKEN, token())
             .putExtra(PhantomService.EXTRA_GOAL, goal)
+            .putExtra(PhantomService.EXTRA_ENGINE, engine)
         ContextCompat.startForegroundService(this, intent)
+    }
+
+    /** Download the on-device model once (large; runs off the UI thread). */
+    private fun downloadModel(url: String) {
+        if (url.isEmpty()) {
+            appendLog("Enter a model URL (.task) first.")
+            return
+        }
+        prefs.edit().putString("model_url", url).apply()
+        appendLog("⤓ Downloading model… (this is large, be patient)")
+        Thread {
+            val http = OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(0, TimeUnit.SECONDS)   // no read timeout for a big download
+                .build()
+            try {
+                var lastPct = -1
+                ModelManager(applicationContext, http).download(url) { frac ->
+                    val pct = (frac * 100).toInt()
+                    if (pct != lastPct && pct % 5 == 0) {
+                        lastPct = pct
+                        runOnUiThread { appendLog("  model: $pct%") }
+                    }
+                }
+                runOnUiThread { appendLog("✓ Model downloaded. Tick 'on-device' and Run.") }
+            } catch (e: Exception) {
+                runOnUiThread { appendLog("Model download failed: ${e.message}") }
+            }
+        }.start()
     }
 
     /** PendingIntent the Termux service fills with stdout/stderr and broadcasts. */

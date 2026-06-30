@@ -32,8 +32,25 @@ Install the APK:
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-> A debug APK is unsigned-for-store but installable for personal use. For a
-> shareable release APK, create a keystore and configure `signingConfigs`.
+> A debug APK is installable for personal use straight away.
+
+### Shareable release APK (optional)
+Create a keystore once:
+```bash
+keytool -genkey -v -keystore phantom.jks -keyalg RSA -keysize 2048 \
+  -validity 10000 -alias phantom
+```
+Then build a signed release by pointing the build at it via env vars:
+```bash
+export PHANTOM_KEYSTORE=$PWD/phantom.jks
+export PHANTOM_KEYSTORE_PASSWORD=...    # store password
+export PHANTOM_KEY_ALIAS=phantom
+export PHANTOM_KEY_PASSWORD=...         # key password
+cd android && ./gradlew assembleRelease
+# -> app/build/outputs/apk/release/app-release.apk
+```
+If `PHANTOM_KEYSTORE` is unset the release build is simply unsigned, so the
+debug build (and CI) are unaffected. Keep the keystore + passwords out of git.
 
 ## Pairing (Phase 5)
 The gate is token-secured: on start it prints a `PHANTOM:<code>` and a QR.

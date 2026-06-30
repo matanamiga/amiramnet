@@ -43,7 +43,8 @@ session. Defer the embedded LLM (Phase 4) and pairing (Phase 5).
   pytest — the Android app is verified to compile.
 - ✅ mDNS/zeroconf auto-discovery — the gate advertises `_phantom._tcp`; the app
   has a "Find gate on Wi-Fi" button (`GateDiscovery` / `phantom/pc/discovery.py`).
-- Real device E2E run + screenshots; signed release APK.
+- ✅ Signed release APK support (optional keystore via `PHANTOM_KEYSTORE` env).
+- Real device E2E run + screenshots (needs physical hardware).
 
 ## Session log
 - Session 1: phases 0–5 (all planned). Rebranded amiranet → Phantom; Python

@@ -15,10 +15,26 @@ android {
         versionName = "0.1.0"
     }
 
+    // Optional release signing: active only when PHANTOM_KEYSTORE points at a
+    // real keystore (e.g. for a shareable release APK). Otherwise the release
+    // build is simply unsigned and CI's debug build is unaffected.
+    val keystorePath = System.getenv("PHANTOM_KEYSTORE")
+    signingConfigs {
+        if (keystorePath != null && file(keystorePath).exists()) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("PHANTOM_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("PHANTOM_KEY_ALIAS")
+                keyPassword = System.getenv("PHANTOM_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

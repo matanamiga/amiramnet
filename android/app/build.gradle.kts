@@ -60,6 +60,8 @@ dependencies {
     // Embedded on-device LLM (Phase 6): MediaPipe LLM Inference (vision).
     implementation("com.google.mediapipe:tasks-genai:0.10.24")
     // Provides com.google.mediapipe.framework.image.{MPImage,BitmapImageBuilder}
-    // used to pass screenshots into the vision model.
-    implementation("com.google.mediapipe:tasks-vision:0.10.24")
+    // for passing screenshots into the vision model. tasks-vision uses its own
+    // version line, so resolve the latest existing 0.10.x dynamically rather
+    // than pin a number that may not exist.
+    implementation("com.google.mediapipe:tasks-vision:0.10.+")
 }
